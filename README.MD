@@ -23,4 +23,6 @@ Si sale con IA pero hay cosas importantes a aclarar para que erre menos como:
 >- 1. emu8086 solo registros de 16bits lamentablemente muy limitado
 >- 2. tienen que ver como debugearlo y compilarlo para poder ejecutarlo
 >- 3. sintaxis CISC Y **INTEL**
->- 4. funcion offset no funciona en este de 16 bits en su lugar tiene que asignar directamente el mesagge para imprimir 
+>- 4. funcion offset no funciona en este de 16 bits en su lugar tiene que asignar directamente el mesagge para imprimir **SOLO LINUX**
+
+## Si trabajas en windows solo tienes que agregarle offset a los prints
