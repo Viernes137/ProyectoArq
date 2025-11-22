@@ -9,13 +9,22 @@ org 100h        ;Este sirve para decir donde iniciar el programa
 ;#################################
 ;En este caso lo voy a usar como menu por que es la app base en si 
 start:
+    ; *** PASO CRUCIAL: Configurar DS para acceder a las variables de datos ***
+    ; En ORG 100h, DS debe apuntar a CS (Segmento de Codigo)
+    mov ax, cs  
+    mov ds, ax
+
     ; ===== LIMPIAR PANTALLA =====
-    call limpiar_pantalla
+    ;call clear_screen
 
     ;#######estas 3 instrucciones sirven para imprimir el menu
     mov ah, 09h 
-    mov dx, menu_msg
+    mov dx, banner_msg
     int 21h         ;========OJO CON ESTO INT21H ES IMPORTANTE LE DICE A TODAS LAS INTRUCCIONES QUE PUSISTE ARRIBA EJECUTA========
+
+    mov ah, 09h 
+    mov dx, menu_options_msg
+    int 21h
 
     ;#######Aca estan las intrucciones para leer la opcion del user
     mov ah, 01h
@@ -60,7 +69,7 @@ start:
 ;funcion de salir del programa equivalente a return 0
 ;#################################
 exit_program:
-    call limpiar_pantalla
+    call clear_screen
     
     mov ah, 09h
     mov dx, goodbye_msg
@@ -73,6 +82,7 @@ exit_program:
 ;funcion agregar_producto
 ;#################################
 agregar_producto:
+    call clear_screen
     mov ah, 09h
     mov dx, agregar_msg
     int 21h
@@ -82,6 +92,7 @@ agregar_producto:
 ;funcion aumentar_existencia
 ;#################################
 aumentar_existencia:
+    call clear_screen
     mov ah, 09h
     mov dx, aumentar_msg
     int 21h
@@ -91,6 +102,7 @@ aumentar_existencia:
 ;funcion reducir_existencia
 ;#################################
 reducir_existencia:
+    call clear_screen
     mov ah, 09h
     mov dx, reducir_msg
     int 21h
@@ -100,6 +112,7 @@ reducir_existencia:
 ;funcion mostrar_inventario
 ;#################################
 mostrar_inventario:
+    call clear_screen
     mov ah, 09h
     mov dx, mostrar_msg
     int 21h
@@ -109,26 +122,33 @@ mostrar_inventario:
 ;FUNCION: limpiar_pantalla
 ;Limpia la pantalla y pone cursor en (0,0)
 ;#################################
-limpiar_pantalla:
+clear_screen:
+    ; Guarda el estado de los registros
     push ax
     push bx
     push cx
     push dx
     
-    ; Scroll up (limpiar pantalla)
-    mov ah, 06h           ; Función 06h = scroll up
-    mov al, 0             ; 0 = limpiar toda la pantalla
-    mov bh, 07h           ; Atributo: blanco sobre negro
-    mov cx, 0             ; Esquina superior izquierda (0,0)
-    mov dx, 184Fh         ; Esquina inferior derecha (24,79)
-    int 10h               ; Llamar BIOS
+    ; --- 1. Limpiar Pantalla (INT 10h / AH=06h) ---
+    mov ah, 06h             ; Funcion: Inicializar/Desplazar ventana hacia arriba
+    mov al, 00h             ; Desplazar 0 lineas (borra toda el area)
+    mov ch, 00h             ; Fila de inicio: 0
+    mov cl, 00h             ; Columna de inicio: 0
     
-    ; Posicionar cursor en (0,0)
-    mov ah, 02h           ; Función 02h = set cursor position
-    mov bh, 0             ; Página 0
-    mov dx, 0             ; DH=fila 0, DL=columna 0
+    ; *** CORRECCION 2: Usar DH y DL por separado ***
+    mov dh, 24              ; Fila final (24 decimal)
+    mov dl, 79              ; Columna final (79 decimal)
+    
+    mov bh, 07h             ; Atributo de color: Blanco sobre Negro
+    int 10h                 ; Llama a la interrupcion de video de la BIOS
+
+    ; --- 2. Mover el cursor a (0, 0) (INT 10h / AH=02h) ---
+    mov ah, 02h             ; Funcion: Establecer posicion del cursor
+    mov bh, 00h             ; Pagina 0
+    mov dx, 0000h           ; DH=Fila 0, DL=Columna 0
     int 10h
     
+    ; Restaura los registros
     pop dx
     pop cx
     pop bx
@@ -139,22 +159,20 @@ limpiar_pantalla:
 ;==============================
 ; MENSAJES del menu
 ;==============================
-menu_msg db 13, 10, 13, 10
-         db '$$\                                          $$\                         $$\           ', 13, 10
-         db '\__|                                         $$ |                        \__|      ', 13, 10
-         db '$$\ $$$$$$$\ $$\    $$\  $$$$$$\  $$$$$$$\ $$$$$$\    $$$$$$\   $$$$$$\  $$\  $$$$$$\  ', 13, 10
-         db '$$ |$$  __$$\\$$\  $$  |$$  __$$\ $$  __$$\\_$$  _|   \____$$\ $$  __$$\ $$ |$$  __$$\ ', 13, 10
-         db '$$ |$$ |  $$ |\$$\$$  / $$$$$$$$ |$$ |  $$ | $$ |     $$$$$$$ |$$ |  \__|$$ |$$ /  $$ |', 13, 10
-         db '$$ |$$ |  $$ | \$$$  /  $$   ____|$$ |  $$ | $$ |$$\ $$  __$$ |$$ |      $$ |$$ |  $$ |', 13, 10
-         db '$$ |$$ |  $$ |  \$  /   \$$$$$$$\ $$ |  $$ | \$$$$  |\$$$$$$$ |$$ |      $$ |\$$$$$$  |', 13, 10
-         db '\__|\__|  \__|   \_/     \_______|\__|  \__|  \____/  \_______|\__|      \__| \______/ ', 13, 10
-         db '#####################################################################################################', 13, 10, 13, 10
-         db '- 1 Agregar producto', 13, 10
-         db '- 2 Aumentar existencia', 13, 10
-         db '- 3 Reducir existencia', 13, 10
-         db '- 4 Mostrar inventario', 13, 10
-         db '- 5 Salir', 13, 10
-         db 'Opcion: $'
+banner_msg db 13, 10, 13, 10
+         db '_____                          _____              _____       ', 13, 10
+         db '___(_)_________   _______________  /______ __________(_)_____ ', 13, 10
+         db '__  /__  __ \_ | / /  _ \_  __ \  __/  __ `/_  ___/_  /_  __ \', 13, 10
+         db '_  / _  / / /_ |/ //  __/  / / / /_ / /_/ /_  /   _  / / /_/ /', 13, 10
+         db '/_/  /_/ /_/_____/ \___//_/ /_/\__/ \__,_/ /_/    /_/  \____/ ', 13, 10
+         db '################################################################', 13, 10, 13, 10, '$'
+
+menu_options_msg db '          1. Agregar producto', 13, 10
+                 db '          2. Aumentar existencia', 13, 10
+                 db '          3. Reducir existencia', 13, 10
+                 db '          4. Mostrar inventario', 13, 10
+                 db '          5. Salir', 13, 10
+                 db 13, 10, 'Elige una opcion (1-5): $' 
 
 ;==============================
 ; MENSAJES generales
