@@ -5,6 +5,13 @@
 org 100h        ;Este sirve para decir donde iniciar el programa
 
 ;#################################
+;Variables globales
+;#################################
+product_count db 0 ;para usarlo de contador
+product_code db 50 dup(0); ; por ahora asi con 50 produtos 
+
+
+;#################################
 ;Funcion Start equivalente al main
 ;#################################
 ;En este caso lo voy a usar como menu por que es la app base en si 
