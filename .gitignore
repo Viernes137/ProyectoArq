@@ -1,0 +1,8 @@
+#mis notas
+*.txt
+
+#carpeta
+photos
+
+#cosas de mi emulador
+*com
