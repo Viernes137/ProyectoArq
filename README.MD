@@ -13,7 +13,7 @@ git checkout -b Nombre_rama
 Una vez echa la rama hacerle un push para no perder los cambios 
 
 ## Reparto 
->- Antonio: Menu y funcion1 (agregar_producto)
+>- Antonio: Menu y funcion1 (agregar_producto) **LISTO**
 >- Xime: Funcion2 (aumentar_existencia)
 >- Bruno: Funcion3 (reducir_existencia)
 >- Pablito: Funcion4 (mostrar_inventario) y **DOCUMENTACION**
