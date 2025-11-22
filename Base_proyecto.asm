@@ -7,9 +7,31 @@ org 100h        ;Este sirve para decir donde iniciar el programa
 ;#################################
 ;Variables globales
 ;#################################
-product_count db 0 ;para usarlo de contador
-product_code db 50 dup(0); ; por ahora asi con 50 produtos 
+product_count db 0                  ;para usarlo de contador
 
+;==============================
+; CONTADORES DE CADA PRODUCTO
+;==============================
+papas_count       db 0
+coca_count        db 0
+galletas_count    db 0
+agua_count        db 0
+cerveza_count     db 0
+vodka_count       db 0
+tequila_count     db 0
+jagger_count      db 0
+
+;==============================
+; PRECIOS FIJOS DE CADA PRODUCTO
+;==============================
+papas_price       db 15
+coca_price        db 25
+galletas_price    db 20
+agua_price        db 10
+cerveza_price     db 35
+vodka_price       db 150
+tequila_price     db 120
+jagger_price      db 200
 
 ;#################################
 ;Funcion Start equivalente al main
@@ -22,7 +44,7 @@ start:
     mov ds, ax
 
     ; ===== LIMPIAR PANTALLA =====
-    ;call clear_screen
+    call clear_screen
 
     ;#######estas 3 instrucciones sirven para imprimir el menu
     mov ah, 09h 
@@ -59,6 +81,9 @@ start:
     mov ah, 09h
     mov dx, invalid_option_MSG
     int 21h
+    
+    mov ah, 00h
+    int 16h
 
     ;#####IMPORTANTE PARA COMPLETAR CICLO WHILE####
     jmp start
@@ -90,9 +115,198 @@ exit_program:
 ;#################################
 agregar_producto:
     call clear_screen
+    
+    ; Mostrar menú de productos
     mov ah, 09h
-    mov dx, agregar_msg
+    mov dx, products_options
     int 21h
+    
+    ; Leer opción
+    mov ah, 01h
+    int 21h
+    
+    ; Convertir a índice (0-7)
+    sub al, '1'           ; '1' → 0, '2' → 1, etc.
+    cmp al, 7
+    ja opcion_invalida    ; Si > 7, inválido
+    
+    ; SWITCH según producto elegido
+    cmp al, 0
+    je agregar_papas
+    
+    cmp al, 1
+    je agregar_coca
+    
+    cmp al, 2
+    je agregar_galletas
+    
+    cmp al, 3
+    je agregar_agua
+    
+    cmp al, 4
+    je agregar_cerveza
+    
+    cmp al, 5
+    je agregar_vodka
+    
+    cmp al, 6
+    je agregar_tequila
+    
+    cmp al, 7
+    je agregar_jagger
+
+opcion_invalida:
+    mov ah, 09h
+    mov dx, invalid_option_MSG
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Papas ---
+agregar_papas:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [papas_count], al     ; Sumar cantidad
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Coca ---
+agregar_coca:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [coca_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Galletas ---
+agregar_galletas:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [galletas_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Agua ---
+agregar_agua:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [agua_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Cerveza ---
+agregar_cerveza:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [cerveza_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Vodka ---
+agregar_vodka:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [vodka_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Tequila ---
+agregar_tequila:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [tequila_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
+    jmp start
+
+;--- Agregar Jaggermeister ---
+agregar_jagger:
+    mov ah, 09h
+    mov dx, ask_cantidad
+    int 21h
+    
+    call leer_dos_digitos
+    add [jagger_count], al
+    
+    mov ah, 09h
+    mov dx, msg_agregado
+    int 21h
+    
+    mov ah, 00h
+    int 16h
+    
     jmp start
 
 ;#################################
@@ -103,6 +317,10 @@ aumentar_existencia:
     mov ah, 09h
     mov dx, aumentar_msg
     int 21h
+    
+    mov ah, 00h
+    int 16h
+    
     jmp start
 
 ;#################################
@@ -113,6 +331,10 @@ reducir_existencia:
     mov ah, 09h
     mov dx, reducir_msg
     int 21h
+    
+    mov ah, 00h
+    int 16h
+    
     jmp start
 
 ;#################################
@@ -123,6 +345,10 @@ mostrar_inventario:
     mov ah, 09h
     mov dx, mostrar_msg
     int 21h
+    
+    mov ah, 00h
+    int 16h
+    
     jmp start
 
 ;#################################
@@ -162,6 +388,55 @@ clear_screen:
     pop ax
     ret
 
+;#################################
+; SUBRUTINAS AUXILIARES
+;#################################
+
+;--- Leer dos dígitos ---
+leer_dos_digitos:      ;importante usar el stack para que funcione y no perder los datos
+    push bx
+    
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    mov bl, al
+    
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    mov bh, al
+    
+    mov al, bl
+    mov cl, 10
+    mul cl
+    add al, bh
+    
+    pop bx              ;Pop para guardar la direccion memoria y incrementar el stack pointer 
+    ret
+
+;--- Imprimir dos dígitos ---
+imprimir_dos_digitos:
+    push ax
+    push dx
+    
+    mov bl, 10
+    div bl
+    
+    add al, '0'
+    mov dl, al
+    mov ah, 02h
+    int 21h
+    
+    mov al, ah
+    add al, '0'
+    mov dl, al
+    mov ah, 02h
+    int 21h
+    
+    pop dx
+    pop ax
+    ret
+
 ;DATA
 ;==============================
 ; MENSAJES del menu
@@ -186,6 +461,25 @@ menu_options_msg db '          1. Agregar producto', 13, 10
 ;==============================
 invalid_option_MSG db 'Opcion invalida. Intente de nuevo', 13, 10, '$'
 goodbye_msg        db 13, 10, 'Gracias por usar el sistema!', 13, 10, '$'
+
+;==============================
+; MENSAJES funcion agregar_producto
+;==============================
+Full_storage_msg db 13, 10, 'El inventario esta lleno quita prodcutos', 13, 10, '$'
+Ask_product      db 'Que codigo de producto quieres agregar', 13, 10, '$'
+ask_cantidad     db 13, 10, 'Cantidad (2 digitos): $'
+msg_agregado     db 13, 10, 'Producto agregado exitosamente!', 13, 10, '[Presiona tecla...]$'
+
+;buffers para exixtencia 
+products_options db '          1. Papitas', 13, 10
+                 db '          2. Coca', 13, 10
+                 db '          3. Galletas', 13, 10
+                 db '          4. Agua', 13, 10
+                 db '          5. Cerveza', 13, 10
+                 db '          6. Vodka', 13, 10
+                 db '          7. Tequila', 13, 10
+                 db '          8. Jaggermeister', 13, 10
+                 db 13, 10, 'Elige un producto para agregar (1-8): $' 
 
 ;==============================
 ; MENSAJES temporales (BORRAR después)
