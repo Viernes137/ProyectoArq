@@ -6,3 +6,6 @@ photos
 
 #cosas de mi emulador
 *com
+
+#todos los .md menos README
+!README.MD
