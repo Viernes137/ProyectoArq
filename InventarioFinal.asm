@@ -974,41 +974,53 @@ clear_screen:
 ;#################################
 
 ;--- Leer dos dígitos ---
-leer_dos_digitos:      ;importante usar el stack para que funcione y no perder los datos
+leer_dos_digitos:
     push bx
-    
+    push dx
+
+    ; Leer primer dígito
     mov ah, 01h
     int 21h
     sub al, '0'
-    mov bl, al
-    
+    mov bl, al        ; BL = decenas
+
+    ; Leer segundo dígito
     mov ah, 01h
     int 21h
     sub al, '0'
-    mov bh, al
-    
-    mov al, bl
-    mov cl, 10
-    mul cl
-    add al, bh
-    
-    pop bx              ;Pop para guardar la direccion memoria y incrementar el stack pointer 
+    mov bh, al        ; BH = unidades
+
+    ; Convertir: resultado = BL*10 + BH
+    mov al, bl        ; AL = decena
+    xor ah, ah        ; ???? AH = 0 (esto faltaba)
+    mov dl, 10
+    mul dl            ; AX = AL * 10
+
+    add al, bh        ; AL = decena*10 + unidad
+
+    pop dx
+    pop bx
     ret
+
 
 ;--- Imprimir dos dígitos ---
 imprimir_dos_digitos:
     push ax
     push bx
     push dx
-
+         
+    xor ah, ah     
     mov bl, 10
-    xor ah, ah      ; limpiar AH para evitar basura
     div bl          ; AL = decenas, AH = unidades
-
+     
+    push ax
+    
     ; imprimir decenas (si = 0 imprimir espacio)
     cmp al, 0
     jne impresion_decena
     mov dl, ' '     ; espacio en lugar de 0
+    mov ah, 02h
+    int 21h
     jmp imprimir_unidad
 impresion_decena:
     add al, '0'
@@ -1017,6 +1029,7 @@ impresion_decena:
     int 21h
 
 imprimir_unidad:
+    pop ax
     mov al, ah
     add al, '0'
     mov dl, al
@@ -1034,7 +1047,7 @@ imprimir_tres_digitos:
     push bx
     push dx
     
-    mov ah, 0           ; Limpiar AH
+    xor ah, ah           ; Limpiar AH
     mov bl, 100
     div bl              ; AL = centenas, AH = resto
     
